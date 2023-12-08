@@ -24,6 +24,7 @@ if (process.argv.length != 3) {
 
 let portNumber = process.argv[2];
 
+app.use(express.static(__dirname + '/public'));
 app.set("views", path.resolve(__dirname, "templates"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false }));
