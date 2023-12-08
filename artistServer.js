@@ -102,7 +102,7 @@ async function main() {
     } catch (e) {
         console.error(e);
     }
-    console.log(`Web server started and running at http://localhost:${portNumber}`);
+    console.log(`Web server started and running at https://eight-artists.onrender.com (Port ${portNumber})`);
 
     const prompt = "Stop to shutdown the server: ";
     process.stdout.write(prompt);
