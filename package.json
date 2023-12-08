@@ -1,0 +1,15 @@
+{
+  "name": "8artists",
+  "version": "1.0.0",
+  "description": "A site to search for your favorite music artists and rank your 8 favorites.",
+  "main": "artistServer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eamonrw/8artists.git"
+  },
+  "author": "Eamon Weingold",
+  "license": "ISC"
+}
