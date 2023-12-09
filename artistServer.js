@@ -4,6 +4,7 @@
 const http = require('https');
 const path = require("path");
 const express = require("express");
+const axios = require('axios');
 const fs = require('fs');
 const app = express();
 const bodyParser = require("body-parser");
@@ -29,71 +30,135 @@ app.set("views", path.resolve(__dirname, "templates"));
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false }));
 
+let currentUser;
+
 app.get("/", (request, response) => {
+    response.redirect("/home");
+});
+app.get("/home", (request, response) => {
     response.render("index");
 });
-app.get("/apply", (request, response) => {
-    response.render("application");
-});
-app.post("/processApplication", (request, response) => {
-    const doc = { name: request.body.name, email: request.body.email, gpa: request.body.gpa, info: request.body.info };
-    client.db(databaseAndCollection.db)
-        .collection(databaseAndCollection.collection)
-        .insertOne(doc)
-        .then((result) => {
-            const variables = { ...doc, timestamp: new Date() };
-            response.render("appconfirmation", variables);
-        });
-});
-app.get("/reviewApplication", (request, response) => {
-    response.render("reviewapp");
-});
-app.get("/processReviewApplication", (request, response) => {
-    const email = request.query.email;
-    let filter = { email: email };
-    client.db(databaseAndCollection.db)
-        .collection(databaseAndCollection.collection)
-        .findOne(filter)
-        .then((result) => {
-            if (result) {
-                const variables = { ...result, timestamp: new Date() };
-                response.render("appconfirmation", variables);
-            }
-            else {
-                const variables = { name: 'NONE', email: 'NONE', gpa: 'NONE', info: 'NONE', timestamp: new Date() };
-                response.render("appconfirmation", variables);
-            }
-        });
-});
-app.get("/adminGPA", (request, response) => {
-    response.render("bygpa");
-});
-app.get("/processAdminGPA", (request, response) => {
-    const gpa = request.query.gpa;
-    let filter = { gpa: { $gte: gpa } };
-    const cursor = client.db(databaseAndCollection.db)
-        .collection(databaseAndCollection.collection)
-        .find(filter);
-    cursor.toArray().then((result) => {
-        let table = `<table border="1"><tr><th>Name</th><th>GPA</th></tr>`
-        result.forEach(doc => table += `<tr><td>${doc.name}</td><td>${doc.gpa}</td></tr>`);
-        table += `<table>`;
+app.get("/ranker", (request, response) => {
+    currentUser = request.query.username;
 
-        const variables = { resultsTable: table };
-        response.render("processgpa", variables);
+    if (currentUser)
+        response.render("ranker", {username: currentUser});
+    else
+        response.render("error", {errorMessage: "You can't go here without a username."})
+});
+app.get("/ranker/savedList", (request, response) => {
+    client.db(databaseAndCollection.db)
+    .collection(databaseAndCollection.collection)
+    .findOne({username: currentUser})
+    .then((result) => {
+        response.json(result);
     });
 });
-app.get("/adminRemove", (request, response) => {
-    response.render("removeall");
-});
-app.post("/processAdminRemove", (request, response) => {
+app.post("/ranker", (request, response) => {
+    let doc = {username: currentUser, rankings: JSON.parse(request.body.rankings)};
     client.db(databaseAndCollection.db)
         .collection(databaseAndCollection.collection)
-        .deleteMany({})
+        .replaceOne({username: currentUser}, doc, {upsert: true})
         .then((result) => {
-            const variables = { numApps: result.deletedCount };
-            response.render("removed", variables);
+            response.render("saved", {username: currentUser})
         });
+});
+
+// /list?user=myUserName
+app.get("/list", (request, response) => {
+    const username = request.query.username;
+
+    if (username) {
+        client.db(databaseAndCollection.db)
+        .collection(databaseAndCollection.collection)
+        .findOne({username: username})
+        .then((result) => {
+            let fList = "<h3>This user has not created a list. Sorry!</h3>";
+            if (result && result.rankings) {
+                fList = `<ol type="1">`;
+                for (const [i, a] of result.rankings.entries()) {
+                    fList += `
+                        <li>
+                            <div class="list-item">
+                                <div class="artist-rank">${i + 1}</div>
+                                <div class="artist-photo">
+                                    <img alt="Artist profile picture" src="${a.photoURL}" width="120"
+                                        height="120">
+                                </div>
+                                <div class="artist-info">
+                                    <h4>${a.name}</h4>
+                                    <h5>${a.monthlyListeners}</h5>
+                                    <h5><a href="${a.spotifyLink}">View on Spotify</a></h5>
+                                </div>
+                            </div>
+                        </li>
+                        `;
+                }
+                fList += `</ol>`;
+            }
+
+            response.render("viewer", {username: username, formattedList: fList});
+        });
+    }
+    else
+        response.render("error", {errorMessage: "You can't go here without a username."})
+});
+
+app.get("/ranker/search", async (request, response) => {
+    let artistData = {artists: []};
+
+    const options = {
+        method: 'GET',
+        url: 'https://spotify23.p.rapidapi.com/search/',
+        params: {
+            q: request.query.artistName,
+            type: 'artists',
+            offset: '0',
+            limit: '5',
+            numberOfTopResults: '5'
+        },
+        headers: {
+            'X-RapidAPI-Key': '2c150bc4a4msh832ff974a8b058ap16da21jsn4b687556470b',
+            'X-RapidAPI-Host': 'spotify23.p.rapidapi.com'
+        }
+    };
+
+    try {
+        const res = await axios.request(options);
+
+        for (item of res.data.artists.items) {
+            let a = {name: item.data.profile.name, photoURL: item.data.visuals.avatarImage?.sources[0].url ?? '/image/default.jpg'};
+
+            a.artistId = item.data.uri.replace("spotify:artist:", "");
+
+            const ops = {
+                method: 'GET',
+                url: 'https://spotify23.p.rapidapi.com/artist_overview/',
+                params: {
+                  id: a.artistId
+                },
+                headers: {
+                  'X-RapidAPI-Key': '2c150bc4a4msh832ff974a8b058ap16da21jsn4b687556470b',
+                  'X-RapidAPI-Host': 'spotify23.p.rapidapi.com'
+                }
+            };
+
+            try {
+                const res2 = await axios.request(ops);
+
+                a.spotifyLink = res2.data.data.artist.sharingInfo.shareUrl;
+                a.monthlyListeners = res2.data.data.artist.stats.monthlyListeners ?? 0;
+
+                artistData.artists.push(a);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        response.json(artistData);
+    } catch (error) {
+        console.error(error);
+    }
 });
 
 async function main() {

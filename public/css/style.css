@@ -24,7 +24,7 @@ body {
     border: 3px solid var(--secondary);
     position: fixed;
     width: 100%;
-    height: 3rem;
+    height: 4rem;
 }
 
 .banner a {
@@ -35,6 +35,10 @@ body {
 }
 .banner h1 {
     margin: auto;
+}
+.banner p {
+    line-height: .75;
+    font-size: .75rem;
 }
 
 .content {
@@ -101,7 +105,7 @@ hr {
     margin: .5rem;
 }
 
-#results-pane ol, #list-pane ol {
+ol {
     width: 80%;
     list-style: none;
 }
@@ -163,4 +167,29 @@ button:hover {
 
 .artist-info button {
     max-width: 8rem;
+    margin-top: .5rem;
+}
+
+#otherlist {
+    margin: auto;
+}
+
+#otherlist .artist-rank {
+    font-size: 1.5rem;
+    flex: 7;
+    padding-right: 2rem;
+    text-align: right;
+    margin: auto 0;
+}
+#otherlist .artist-photo {
+    flex: 1;
+    padding: 1rem 1rem 1rem 0rem;
+    margin: auto;
+    text-align: right;
+}
+#otherlist .artist-info {
+    flex: 6;
+    padding: 1rem 0rem;
+    margin: auto;
+    text-align: left;
 }

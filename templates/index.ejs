@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Artist Ranker</title>
+    <title>8Artists</title>
     <link rel="stylesheet" href="/css/style.css" type="text/css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,24 +12,25 @@
 
 <body>
     <div class="banner">
-        <a href="/" title="Go Home">🏠</a>
+        <a href="/home" title="Go Home">🏠</a>
         <h1>🎶 8Artists 🎶</h1>
+        <p>Made by Eamon Weingold</p>
     </div>
     
     <div class="content">
         <h2>Use this site to find your favorite
             artists and rank them in your own personal top 8!</h2>
         <br>
-        <form action="/search">
+        <form action="/ranker" method="GET">
             <h4>Enter your username to build your own list!</h4>
-            <input type="text" placeholder="Enter username" required>
+            <input type="text" name="username" placeholder="Enter username" required>
             <input type="submit" value="Start ranking">
         </form>
         <br>
-        <form action="/search">
+        <form action="/list" method="GET">
             <h4>Just want to check out someone's list?</h4>
-            <input type="text" placeholder="Enter username" required>
-            <input type="submit" value="See the list">
+            <input type="text" name="username" placeholder="Enter username" required>
+            <input type="submit" value="See their list">
         </form>
     </div>
 

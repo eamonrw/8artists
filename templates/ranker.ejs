@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Artist Ranker</title>
+    <title>8Artists</title>
     <link rel="stylesheet" href="/css/style.css" type="text/css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,98 +12,200 @@
 
 <body>
     <div class="banner">
-        <a href="/" title="Go Home">🏠</a>
+        <a href="/home" title="Go Home">🏠</a>
         <h1>🎶 8Artists 🎶</h1>
+        <p>Made by Eamon Weingold</p>
     </div>
 
     <div class="content">
-        <h2>Search for artists and add them to your list.</h2>
+        <h2>Hello <%- username %>! Search for artists and add them to your list.</h2>
         <br>
-        <input type="submit" value="Save and Exit">
+        <input type="submit" onclick="saveAndExit()" value="Save and Exit">
         <br><br>
     </div>
+
+    <script>
+        window.onload = main;
+
+        let rankings = [];
+        let searchResults;
+
+        function refreshList() {
+            let listDisplay = document.querySelector("#list-pane ol");
+            listDisplay.innerHTML = "";
+
+            for (const [i, a] of rankings.entries()) {
+                listDisplay.innerHTML += `
+                <li>
+                    <div class="list-item">
+                        <div class="artist-rank">${i + 1}</div>
+                        <div class="artist-photo">
+                            <img alt="Artist profile picture" src="${a.photoURL}" width="70"
+                                height="70">
+                            <button onclick="shiftUp(${i})">Move Up</button>
+                            <button onclick="shiftDown(${i})">Move Down</button>
+                        </div>
+                        <div class="artist-info">
+                            <h4>${a.name}</h4>
+                            <h5>${a.monthlyListeners} Monthly Listeners</h5>
+                            <h5><a href="${a.spotifyLink}" target=”_blank”>View on Spotify</a></h5>
+                            <button onclick="removeFromList(${i})">Remove from List</button>
+                        </div>
+                    </div>
+                </li>
+                `;
+            };
+        }
+
+        function addToList(i) {
+            let artist = searchResults.artists[i];
+            if (rankings.length >= 8) {
+                alert("Your list is already full. You need to remove an artist on your list first.")
+            }
+            else {
+                rankings.push(artist);
+            }
+
+            refreshList();
+        }
+
+        function removeFromList(i) {
+            rankings.splice(i, 1);
+
+            refreshList();
+        }
+
+        function shiftUp(i) {
+            if (i > 0) {
+                [rankings[i], rankings[i - 1]] = [rankings[i - 1], rankings[i]];
+
+                refreshList();
+            }
+        }
+        function shiftDown(i) {
+            if (i < rankings.length - 1) {
+                [rankings[i], rankings[i + 1]] = [rankings[i + 1], rankings[i]];
+
+                refreshList();
+            }
+        }
+
+        async function getSearchResults() {
+            let resultsDisplay = document.querySelector("#results-pane ol");
+            resultsDisplay.innerHTML = "Loading Results...";
+
+            // let response = await fetch("/ranker/search?artistName=" + document.getElementById("searchBar").value);
+            // let data = await response.json();
+            let data = {
+                "artists": [
+                    {
+                        "name": "Bruno Mars",
+                        "photoURL": "https://i.scdn.co/image/ab6761610000e5ebc36dd9eb55fb0db4911f25dd",
+                        "artistId": "0du5cEVh5yTK9QJze8zA0C",
+                        "spotifyLink": "https://open.spotify.com/artist/0du5cEVh5yTK9QJze8zA0C?si=Upy-wu0EQb-vl_5tZ_SW8A",
+                        "monthlyListeners": 65390113
+                    },
+                    {
+                        "name": "Bruno Major",
+                        "photoURL": "https://i.scdn.co/image/ab6761610000e5eb5b43a1fdff498297feb1d128",
+                        "artistId": "0hDjKSKjl1DC7ovYTDJHe8",
+                        "spotifyLink": "https://open.spotify.com/artist/0hDjKSKjl1DC7ovYTDJHe8?si=3cgmlQqNQHGDrZKvzJ5r5g",
+                        "monthlyListeners": 4938370
+                    },
+                    {
+                        "name": "Taylor Swift",
+                        "photoURL": "https://i.scdn.co/image/ab6761610000e5eb859e4c14fa59296c8649e0e4",
+                        "artistId": "06HL4z0CvFAxyc27GXpf02",
+                        "spotifyLink": "https://open.spotify.com/artist/06HL4z0CvFAxyc27GXpf02?si=VL9Wt68HTmOHE-SQbHNLRw",
+                        "monthlyListeners": 109715030
+                    },
+                    {
+                        "name": "Bruno Martini",
+                        "photoURL": "https://i.scdn.co/image/ab6761610000e5eb20904d2939ea94647d101747",
+                        "artistId": "5veVxxPm1vzgi6pO2iVA8L",
+                        "spotifyLink": "https://open.spotify.com/artist/5veVxxPm1vzgi6pO2iVA8L?si=B72q9EudRi2-yw2gqVtmQg",
+                        "monthlyListeners": 5675380
+                    },
+                    {
+                        "name": "Silk Sonic",
+                        "photoURL": "https://i.scdn.co/image/ab6772690000dd22a3ebb27ba9a55044f32af6e1",
+                        "artistId": "6PvvGcCY2XtUcSRld1Wilr",
+                        "spotifyLink": "https://open.spotify.com/artist/6PvvGcCY2XtUcSRld1Wilr?si=wPPx5mpkQBa2dJqXAutz0Q",
+                        "monthlyListeners": 12301954
+                    }
+                ]
+            };
+
+            searchResults = data;
+            resultsDisplay.innerHTML = "";
+            for (const [i, a] of data.artists.entries()) {
+                resultsDisplay.innerHTML += `
+                <li>
+                    <div class="list-item">
+                        <div class="artist-photo">
+                            <img alt="Artist profile picture" src="${a.photoURL}" width="100"
+                                height="100">
+                        </div>
+                        <div class="artist-info">
+                            <h4>${a.name}</h4>
+                            <h5>${a.monthlyListeners} Monthly Listeners</h5>
+                            <h5><a href="${a.spotifyLink}" target=”_blank”>View on Spotify</a></h5>
+                            <button onclick="addToList(${i})">Add to List</button>
+                        </div>
+                    </div>
+                </li>
+                `;
+            };
+        }
+
+        async function saveAndExit() {
+            if (confirm("Are you sure you would like to save your rankings?\nIf you have already saved a list, it will be overwritten.")) {
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = "/ranker";
+                const hiddenField = document.createElement("input");
+                hiddenField.name = "rankings";
+                hiddenField.value = JSON.stringify(rankings);
+                form.appendChild(hiddenField);
+                form.style.display = "none";
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+
+        async function main() {
+            document.getElementById("searchBar").addEventListener("keyup", ({ key }) => {
+                if (key === "Enter") {
+                    getSearchResults();
+                }
+            })
+
+            let response = await fetch("/ranker/savedList");
+            let data = await response.json();
+            if (data) {
+                if (data.rankings) {
+                    rankings = data.rankings;
+                    refreshList();
+                }
+            }
+        }
+    </script>
 
     <div class="flex-container">
 
         <div id="search-pane" class="flex-child">
-            <input type="text" placeholder="🔍 Search for Artists">
-            <input type="submit" value="Search" style="padding: .5rem; border-radius: .5rem;">
+
+            <!-- <form action="/ranker/search" method="GET"> -->
+            <input type="text" id="searchBar" name="artistName" placeholder="🔍 Search for Artists">
+            <input type="submit" value="Search" onclick="getSearchResults()"
+                style="padding: .5rem; border-radius: .5rem;">
+            <!-- </form> -->
 
             <div id="results-pane">
                 <hr>
                 <h3>Top Results</h3>
                 <hr>
                 <ol type="1">
-                    <li>
-                        <div class="list-item">
-                            <div class="artist-photo">
-                                <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="100"
-                                    height="100">
-                            </div>
-                            <div class="artist-info">
-                                <h4>John Smith</h4>
-                                <h5>50788516662 Monthly Listeners</h5>
-                                <h5><a href="spotify">View on Spotify</a></h5>
-                                <button>Add to List</button>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="list-item">
-                            <div class="artist-photo">
-                                <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="100"
-                                    height="100">
-                            </div>
-                            <div class="artist-info">
-                                <h4>John Smith</h4>
-                                <h5>50788516662 Monthly Listeners</h5>
-                                <h5><a href="spotify">View on Spotify</a></h5>
-                                <button>Add to List</button>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="list-item">
-                            <div class="artist-photo">
-                                <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="100"
-                                    height="100">
-                            </div>
-                            <div class="artist-info">
-                                <h4>John Smith</h4>
-                                <h5>50788516662 Monthly Listeners</h5>
-                                <h5><a href="spotify">View on Spotify</a></h5>
-                                <button>Add to List</button>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="list-item">
-                            <div class="artist-photo">
-                                <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="100"
-                                    height="100">
-                            </div>
-                            <div class="artist-info">
-                                <h4>John Smith</h4>
-                                <h5>50788516662 Monthly Listeners</h5>
-                                <h5><a href="spotify">View on Spotify</a></h5>
-                                <button>Add to List</button>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="list-item">
-                            <div class="artist-photo">
-                                <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="100"
-                                    height="100">
-                            </div>
-                            <div class="artist-info">
-                                <h4>John Smith</h4>
-                                <h5>50788516662 Monthly Listeners</h5>
-                                <h5><a href="spotify">View on Spotify</a></h5>
-                                <button>Add to List</button>
-                            </div>
-                        </div>
-                    </li>
                 </ol>
             </div>
 
@@ -114,130 +216,6 @@
             <h3>Your Rankings</h3>
             <hr>
             <ol type="1">
-                <li>
-                    <div class="list-item">
-                        <div class="artist-rank">1</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="list-item">
-                        <div class="artist-rank">2</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="artist-rank">3</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="artist-rank">4</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="artist-rank">5</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="artist-rank">6</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="artist-rank">7</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                    <div class="list-item">
-                        <div class="artist-rank">8</div>
-                        <div class="artist-photo">
-                            <img alt="Artist profile picture" src="../Default_avatar_profile.jpg" width="70"
-                                height="70">
-                                <button>Move Up</button>
-                                <button>Move Down</button>
-                        </div>
-                        <div class="artist-info">
-                            <h4>John Smith</h4>
-                            <h5>50788516662 Monthly Listeners</h5>
-                            <h5><a href="spotify">View on Spotify</a></h5>
-                            <button>Remove from List</button>
-                        </div>
-                    </div>
-                </li>
             </ol>
         </div>
 
