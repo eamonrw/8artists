@@ -94,47 +94,8 @@
             let resultsDisplay = document.querySelector("#results-pane ol");
             resultsDisplay.innerHTML = "Loading Results...";
 
-            // let response = await fetch("/ranker/search?artistName=" + document.getElementById("searchBar").value);
-            // let data = await response.json();
-            let data = {
-                "artists": [
-                    {
-                        "name": "Bruno Mars",
-                        "photoURL": "https://i.scdn.co/image/ab6761610000e5ebc36dd9eb55fb0db4911f25dd",
-                        "artistId": "0du5cEVh5yTK9QJze8zA0C",
-                        "spotifyLink": "https://open.spotify.com/artist/0du5cEVh5yTK9QJze8zA0C?si=Upy-wu0EQb-vl_5tZ_SW8A",
-                        "monthlyListeners": 65390113
-                    },
-                    {
-                        "name": "Bruno Major",
-                        "photoURL": "https://i.scdn.co/image/ab6761610000e5eb5b43a1fdff498297feb1d128",
-                        "artistId": "0hDjKSKjl1DC7ovYTDJHe8",
-                        "spotifyLink": "https://open.spotify.com/artist/0hDjKSKjl1DC7ovYTDJHe8?si=3cgmlQqNQHGDrZKvzJ5r5g",
-                        "monthlyListeners": 4938370
-                    },
-                    {
-                        "name": "Taylor Swift",
-                        "photoURL": "https://i.scdn.co/image/ab6761610000e5eb859e4c14fa59296c8649e0e4",
-                        "artistId": "06HL4z0CvFAxyc27GXpf02",
-                        "spotifyLink": "https://open.spotify.com/artist/06HL4z0CvFAxyc27GXpf02?si=VL9Wt68HTmOHE-SQbHNLRw",
-                        "monthlyListeners": 109715030
-                    },
-                    {
-                        "name": "Bruno Martini",
-                        "photoURL": "https://i.scdn.co/image/ab6761610000e5eb20904d2939ea94647d101747",
-                        "artistId": "5veVxxPm1vzgi6pO2iVA8L",
-                        "spotifyLink": "https://open.spotify.com/artist/5veVxxPm1vzgi6pO2iVA8L?si=B72q9EudRi2-yw2gqVtmQg",
-                        "monthlyListeners": 5675380
-                    },
-                    {
-                        "name": "Silk Sonic",
-                        "photoURL": "https://i.scdn.co/image/ab6772690000dd22a3ebb27ba9a55044f32af6e1",
-                        "artistId": "6PvvGcCY2XtUcSRld1Wilr",
-                        "spotifyLink": "https://open.spotify.com/artist/6PvvGcCY2XtUcSRld1Wilr?si=wPPx5mpkQBa2dJqXAutz0Q",
-                        "monthlyListeners": 12301954
-                    }
-                ]
-            };
+            let response = await fetch("/ranker/search?artistName=" + document.getElementById("searchBar").value);
+            let data = await response.json();
 
             searchResults = data;
             resultsDisplay.innerHTML = "";
