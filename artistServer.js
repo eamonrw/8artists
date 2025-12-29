@@ -10,7 +10,7 @@ const app = express();
 const bodyParser = require("body-parser");
 require("dotenv").config({ path: path.resolve(__dirname, 'credentialsDontPost/.env') })
 
-const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@cluster0.lhbz01p.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.MONGO_DB_USERNAME}:${process.env.MONGO_DB_PASSWORD}@8artists.28rdvyn.mongodb.net/?appName=8artists`;
 const databaseAndCollection = { db: process.env.MONGO_DB_NAME, collection: process.env.MONGO_COLLECTION };
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
